@@ -9,5 +9,5 @@ API request is sent periodically ( example, for every 5 minutes).
 
 **Working picture:**
 
-![image](https://github.com/user-attachments/assets/c7bd082b-6339-45e8-bb9d-b7778905d084)
+![img.png](img.png)
 
