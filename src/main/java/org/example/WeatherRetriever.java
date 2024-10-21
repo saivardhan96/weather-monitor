@@ -29,6 +29,7 @@ public class WeatherRetriever {
     final double threshold;
     DataRepository dr ;
     private final int unit;
+    private String unitChar;
 
 
     public WeatherRetriever(String pincode, double threshold, int unit) {
@@ -84,7 +85,7 @@ public class WeatherRetriever {
                 tempStats[3]+=1.0;
                 tempStats[0] = Math.max(tempStats[0], temp);
                 tempStats[1] = Math.min(tempStats[1], temp);// imp
-                System.out.println(temp + "`C at "+timeFormatter().substring(0,8));
+                System.out.println(temp+this.unitChar+" at "+timeFormatter().substring(0,8));
             }
             catch (Exception fe){
                 System.out.println("Network Error.. more info: "+ fe.getMessage());
@@ -161,9 +162,18 @@ public class WeatherRetriever {
 
     private double tempConverter(int unit, double temp){
         double ans;
-        if(unit == 1) ans  = temp - 273.15;
-        else if(unit == 2) ans = ((temp -273.15)*1.8)+32.0;
-        else ans = temp;
+        if(unit == 1) {
+            ans  = temp - 273.15;
+            this.unitChar = "`C";
+        }
+        else if(unit == 2) {
+            ans = ((temp -273.15)*1.8)+32.0;
+            this.unitChar = "`F";
+        }
+        else {
+            ans = temp;
+            this.unitChar = "`K";
+        }
         return Double.parseDouble(new DecimalFormat("###.00").format(ans));
     }
 
