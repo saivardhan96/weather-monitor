@@ -7,16 +7,23 @@ public class Main {
     public static void main(String[] args)  {
         Scanner sc =  new Scanner(System.in);
         double threshold = -1.0;
-        System.out.println("Weather API Scheduler demo\n");
+        System.out.println("Weather Monitor Scheduler demo\n");
         System.out.println("Enter pincode of your area: ");
         String pincode  = sc.nextLine();
+        System.out.println("""
+                Select your unit
+                1. Celsius
+                2. Fahrenheit
+                3. Kelvin""");
+        int unit = sc.nextInt();
+        sc.nextLine();
         System.out.println("Do you want to set an alert ? (Y/N) ");
         String opt = sc.nextLine();
         if(Objects.equals(opt.toLowerCase(), "y")) {
             System.out.println("Enter the threshold temperature (in celcius): ");
             threshold = sc.nextDouble();
         }
-        WeatherRetriever wr = new WeatherRetriever(pincode , threshold);
+        WeatherRetriever wr = new WeatherRetriever(pincode , threshold, unit);
         wr.start();
     }
 

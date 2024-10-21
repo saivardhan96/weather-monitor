@@ -28,14 +28,16 @@ public class WeatherRetriever {
     final double[] tempStats ;
     final double threshold;
     DataRepository dr ;
+    private final int unit;
 
 
-    public WeatherRetriever(String pincode, double threshold) {
+    public WeatherRetriever(String pincode, double threshold, int unit) {
         this.geoLocations = new String[3];
         this.client = HttpClient.newHttpClient();
         this.pincode = pincode;
         this.threshold = threshold;
         this.tempStats = new double[]{0.0, 1032.0, 0.0, 0.0};
+        this.unit = unit;
         try{
             getCordinates(this.pincode);
             this.dr = new DataRepository();
@@ -69,8 +71,7 @@ public class WeatherRetriever {
                 String main = data.get("weather").get(0).get("main").toString();
                 condition.put(main, condition.getOrDefault(main,0)+1);
                 double temp = Double.parseDouble(data.get("main").get("feels_like").toString());
-                temp-=273.15;
-                temp = Double.parseDouble(new DecimalFormat("###.00").format(temp));
+                temp = tempConverter(this.unit, temp);
                 if(temp >= threshold && threshold!=-1){
                     alertTimer[0]++;
                     if(alertTimer[0] > 3) {
@@ -84,7 +85,6 @@ public class WeatherRetriever {
                 tempStats[0] = Math.max(tempStats[0], temp);
                 tempStats[1] = Math.min(tempStats[1], temp);// imp
                 System.out.println(temp + "`C at "+timeFormatter().substring(0,8));
-
             }
             catch (Exception fe){
                 System.out.println("Network Error.. more info: "+ fe.getMessage());
@@ -99,14 +99,12 @@ public class WeatherRetriever {
             scheduler.shutdown();
             try {
                 System.out.println("Data is being uploaded to database.");
-                dr.saveInfo(tempStats, geoLocations, maxCondition(condition));
+                dr.saveInfo(tempStats, geoLocations, maxCondition(condition), this.unit);
             } catch (SQLException e) {
                 System.out.println("Failed to upload the data to database :( ! Cause:  " + e.getMessage() );
             }
             System.out.println("\nThank you!!");
         },30,TimeUnit.SECONDS);
-
-
     }
 
 
@@ -158,6 +156,15 @@ public class WeatherRetriever {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss , dd/MM/yyyy");
         LocalDateTime now = LocalDateTime.now();
         return dtf.format(now);
+    }
+
+
+    private double tempConverter(int unit, double temp){
+        double ans;
+        if(unit == 1) ans  = temp - 273.15;
+        else if(unit == 2) ans = ((temp -273.15)*1.8)+32.0;
+        else ans = temp;
+        return Double.parseDouble(new DecimalFormat("###.00").format(ans));
     }
 
 }
