@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 public class DataRepository {
 
@@ -17,13 +18,14 @@ public class DataRepository {
     public void saveInfo(double[] tempStats, String[] geo, String condition, int unit) throws SQLException {
         tempStats[2] = tempStats[2]/tempStats[3];
         tempConverter(unit,tempStats);
-        PreparedStatement ps = con.prepareStatement("insert into temperature values( ?, ?, ?, ?, ?, ?)");
+        PreparedStatement ps = con.prepareStatement("insert into temperature values( ?,?, ?, ?, ?, ?, ?)");
         ps.setString(1 , LocalDate.now().toString());
-        ps.setString(2 , geo[2]);
-        ps.setDouble(3 , tempStats[0]);
-        ps.setDouble(4 , tempStats[1]);
-        ps.setDouble(5, tempStats[2]);
-        ps.setString(6,condition);
+        ps.setString(2, LocalTime.now().toString().substring(0,9));
+        ps.setString(3 , geo[2].substring(1,geo[2].length()-1));
+        ps.setDouble(4 , tempStats[0]);
+        ps.setDouble(5 , tempStats[1]);
+        ps.setDouble(6, tempStats[2]);
+        ps.setString(7,condition.substring(1,condition.length()-1));
         int rs = ps.executeUpdate();
 
         if(rs == 1) System.out.println("Data has been uploaded successfully");
